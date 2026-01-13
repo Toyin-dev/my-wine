@@ -4,9 +4,9 @@ import numpy as np
 import joblib
 
 model = joblib.load("wine_prediction_model.pkl")
-scaler = joblib.load("scaler.pkl2")
-prediction= model.predict(input_data)[0]
-## feature_columns = joblib.load("feature_columns.pkl")
+scaler = joblib.load("scaler.pkl")
+## prediction= model.predict(input_data)[0]
+feature_columns = joblib.load("feature_columns.pkl")
 
 st.set_page_config(page_title="Wine Prediction App", layout="centered")
 
@@ -43,10 +43,10 @@ input_data = pd.DataFrame({
     
         "fixed_acidity": [fixed_acidity], # type: ignore
         "volatile_acidity": [volatile_acidity],  # type: ignore
-        "citric_acid": [citric acid], 
+        "citric_acid": [citric_acid], 
         "residual_sugar": [residual_sugar], 
         "chlorides": [chlorides], 
-        "free_sulfur_dioxide": [free_sulphur_dioxide], 
+        "free_sulfur_dioxide": [free_sulfur_dioxide], 
         "total_sulfur_dioxide": [total_sulfur_dioxide], 
         "density": [density], 
         "pH": [pH], 
@@ -56,8 +56,16 @@ input_data = pd.DataFrame({
 st.subheader(" Input Summary")
 st.dataframe(input_data)
 
+# Make sure 'quality' isn't expected
+if 'quality' in scaler.feature_names_in_:
+    cols = [c for c in scaler.feature_names_in_ if c != 'quality']
+    input_data = input_data.reindex(columns=cols)
 
-scaled_features = scaler.transform(X)
+
+input_data.columns = input_data.columns.str.replace('_', ' ')
+
+scaled_features = scaler.transform(data)
+prediction = model.predict(scaled_features)
 
 
 prediction = np.random.uniform(0, 10)
