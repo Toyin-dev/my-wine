@@ -1,4 +1,30 @@
-import streamlit as st
+from fastapi import FastAPI
+import joblib
+import pandas as pd
+
+app = FastAPI()
+
+model = joblib.load("model.pkl")
+
+@app.get("/")
+def home():
+    return {"message": "Wine Quality API 🍷 is running"}
+
+@app.post("/predict")
+def predict(data: dict):
+    try:
+        df = pd.DataFrame([data])
+        prediction = model.predict(df)[0]
+        return {"wine_quality": int(prediction)}
+    
+    except Exception as e:
+        return {"error": str(e)}
+
+
+
+
+
+""" import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
@@ -65,4 +91,4 @@ if st.button("Predict Wine Quality"):
     elif prediction == "Average":
         st.warning(f" Predicted: Wine Quality is Average")
     else: 
-        st.warning(f" Predicted: Wine Quality is Poor")
+        st.warning(f" Predicted: Wine Quality is Poor") """
